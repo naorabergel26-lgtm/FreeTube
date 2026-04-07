@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>נטיוב – דף בית ליוטיוב</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     HEADER
+════════════════════════════════════════ -->
+<header id="siteHeader" class="site-header hidden">
+  <div class="site-header-inner">
+
+    <div class="sh-logo" onclick="goHome()" style="cursor: pointer;">
+      <div class="sh-logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M23 7s-.3-2-1.2-2.8C20.7 3 19.4 3 18.8 2.9 16.2 2.7 12 2.7 12
+                   2.7S7.8 2.7 5.2 2.9C4.6 3 3.3 3 2.2 4.2 1.3 5 1 7 1 7S.7 9.1.7
+                   11.3v2c0 2.1.3 4.2.3 4.2s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2
+                   C7.5 21.6 12 21.6 12 21.6s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8
+                   1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7zM9.7 15.5V8.2
+                   l8.1 3.7-8.1 3.6z" fill="white"/>
+        </svg>
+      </div>
+      <span class="sh-logo-name">נט<span class="accent">יוב</span></span>
+    </div>
+
+    <div class="sh-search">
+      <input type="text" id="headerInput" placeholder="חיפוש חדש...">
+      <button class="btn-clear" id="btnClearSearch" onclick="clearHeaderSearch()" style="display: none;" title="נקה חיפוש">✕</button>
+      <button class="btn-submit" onclick="startSearch(document.getElementById('headerInput').value.trim())">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="6.5"/>
+          <line x1="16.5" y1="16.5" x2="21.5" y2="21.5"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="sh-status">
+      <div class="status-dot idle" id="statusDot"></div>
+      <span id="statusText">מוכן לחיפוש</span>
+    </div>
+
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero">
+
+    <div class="hero-logo">
+      <div class="hero-logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M23 7s-.3-2-1.2-2.8C20.7 3 19.4 3 18.8 2.9 16.2 2.7 12 2.7 12
+                   2.7S7.8 2.7 5.2 2.9C4.6 3 3.3 3 2.2 4.2 1.3 5 1 7 1 7S.7 9.1.7
+                   11.3v2c0 2.1.3 4.2.3 4.2s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2
+                   C7.5 21.6 12 21.6 12 21.6s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8
+                   1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7zM9.7 15.5V8.2
+                   l8.1 3.7-8.1 3.6z" fill="white"/>
+        </svg>
+      </div>
+      <span class="hero-logo-name">נט<span class="accent">יוב</span></span>
+    </div>
+
+    <p class="hero-tagline">
+      דף בית לאתר YouTube לבעלי הסינונים השונים
+    </p>
+
+    <div class="hero-search-wrap">
+      <input
+        type="text"
+        id="heroInput"
+        placeholder="חפשו סרטון, ערוץ או נושא...">
+      <button class="btn-hero-search" onclick="startSearch(heroInput.value.trim())">
+        חפש
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     MAIN LAYOUT
+════════════════════════════════════════ -->
+<div id="mainLayout" class="main-layout hidden">
+
+  <!-- ── Results panel ── -->
+  <div class="results-panel">
+    <div class="panel-header">
+      <div class="panel-title">
+        סרטונים פתוחים
+        <span class="count-badge" id="openCount">0</span>
+      </div>
+    </div>
+
+    <div class="results-grid" id="resultsGrid">
+      <!-- cards injected by JS -->
+    </div>
+
+    <div id="loadMoreWrap" class="load-more-wrap hidden">
+      <button id="loadMoreBtn" class="btn-load-more" onclick="loadMore()">
+        ⬇ טען עוד תוצאות
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Queue sidebar ── -->
+  <div class="queue-sidebar">
+    <div class="queue-head">
+      <div class="queue-head-row">
+        <h3>תור בדיקה</h3>
+        <div class="q-stats">
+          <span class="q-stat open"    id="qStatOpen">0 ✓</span>
+          <span class="q-stat blocked" id="qStatBlocked">0 ✗</span>
+        </div>
+      </div>
+      <div class="q-progress">
+        <div class="q-prog-labels">
+          <span><span id="qProgChecked">0</span> / <span id="qProgTotal">0</span> נבדקו</span>
+          <span id="qProgPct">0%</span>
+        </div>
+        <div class="q-prog-bar">
+          <div class="q-prog-fill" id="qProgFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="queue-list" id="queueList">
+      <!-- queue items injected by JS -->
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     SETTINGS SECTION
+════════════════════════════════════════ -->
+<div class="settings-section">
+  <div class="settings-card">
+
+    <h2>⚙️ הגדרות מערכת</h2>
+    
+    <!-- Timeout Range Slider -->
+    <div class="settings-group" style="margin-top: 15px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <strong>זמן המתנה לבדיקת סרטון:</strong>
+        <span id="timeoutVal" style="background: var(--bg3); padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">4.5 שניות</span>
+      </div>
+      <p class="settings-desc" style="margin-bottom: 12px; font-size: 12px;">
+        אם האינטרנט שלך איטי, ניתן להאריך את זמן ההמתנה כדי למנוע זיהוי סרטונים פתוחים כחסומים (מומלץ: 4.5 שניות).
+      </p>
+      <input type="range" id="timeoutSlider" min="3" max="10" step="0.5" value="4.5" style="width: 100%; direction: ltr;">
+    </div>
+
+    <h2 style="margin-top: 10px;">🔑 מפתחות YouTube API</h2>
+    <p class="settings-desc">
+      ניתן להוסיף מספר מפתחות. אם מפתח אחד נכשל, המערכת תנסה את הבא.
+      לקבלת מפתח חינמי: <strong>Google Cloud Console → YouTube Data API v3 → Credentials</strong>.
+    </p>
+
+    <!-- API error banner -->
+    <div id="apiErrorBanner" class="api-error-banner"></div>
+
+    <!-- Dynamic key rows -->
+    <div id="apiKeysList" class="api-keys-list">
+      <!-- rendered by JS -->
+    </div>
+
+    <div class="settings-actions">
+      <button class="btn-add-key" onclick="addKeyRow()">+ הוסף מפתח נוסף</button>
+      <button class="btn-save-keys" onclick="saveKeys()">שמור</button>
+      <span class="save-confirm" id="saveConfirm">✓ נשמר בהצלחה</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- Hidden player sandbox -->
+<div id="testers"></div>
+
+<!-- App script -->
+<script src="app.js"></script>
+
+</body>
+</html>
